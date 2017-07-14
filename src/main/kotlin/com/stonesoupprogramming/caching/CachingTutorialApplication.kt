@@ -47,14 +47,15 @@ interface PersistedFileRepository : JpaRepository<PersistedFile, Long>
 @Service
 class PersistedFileService(@Autowired val persistedFileRepository: PersistedFileRepository){
 
-    //This annotation will cause the cache to store persistedFile ids
-    //By storing the ids, we don't need to hit the DB to know if a file exists first
+    //This annotation will cause the cache to store a persistedFile in memory
+    //so that the program doesn't have to hit the DB each time for the file.
+    //This will result in faster page load times. Since we know that managed objects
+    //have unique primary keys, we can just use the primary key for the cache key
     @Cacheable(cacheNames = arrayOf("persistedFile"), key="#id")
     fun findOne(id : Long) : PersistedFile = persistedFileRepository.findOne(id)
 
-    //This annotation will cause the cache to store a persistedFile in memory
-    //so that the program doesn't have to hit the DB each time for the file.
-    //This will result in faster page load times
+    //This annotation will cause the cache to store persistedFile ids
+    //By storing the ids, we don't need to hit the DB to know if a file exists first
     @Cacheable(cacheNames = arrayOf("persistedIds"))
     fun exists(id: Long?): Boolean = persistedFileRepository.exists(id)
 }
